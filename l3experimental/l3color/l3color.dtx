@@ -71,9 +71,6 @@
 %     the components
 %   \item \texttt{cmyk} Cyan-magenta-yellow-black color, with four axes, one for
 %     each of the components
-%   \item \texttt{spot} Spot color, with one value, the name of the color
-%     (see \url{https://helpx.adobe.com/indesign/using/spot-process-colors.html}
-%     for details of the use of spot colors in print)
 % \end{itemize}
 % There are also interface models: these are convenient for users but have
 % to be manipulated before storing/passing to the backend. Interface models
@@ -93,9 +90,9 @@
 % \end{itemize}
 % All interface models are internally stored as |rgb|.
 % 
-% Additional models may be created to allow mixing of spot colors
-% with each other or with those from other models. See
-% Section~\ref{l3color:sec:spot} for more detail of spot color support.
+% Additional models may be created to allow for more complex constructs, for
+% example support for spot colors. See Section~\ref{l3color:sec:addn} for more
+% detail.
 %
 % When color is selected by model, the \meta{values} given are specified as
 % a comma-separated list. The length of the list will therefore be determined
@@ -302,8 +299,38 @@
 %   assigns the data to the \meta{tl}.
 % \end{function}
 %
-% \section{Spot colors}
-% \label{l3color:sec:spot}
+% \section{Additional color models}
+% \label{l3color:sec:addn}
+%
+% Additional color models are required to support specialist workflows, for
+% example those involving separations (see
+% \url{https://helpx.adobe.com/indesign/using/spot-process-colors.html}
+% for details of the use of separations in print). Color models may be split
+% into families; in the case of the basic \texttt{cmyk}, \texttt{gray}
+% and \texttt{rgb} models, the family and the model itself are synonymous. This
+% is not generally the case: see the PDF reference for more details. 
+% 
+% \begin{function}{\color_model_new:nnn}
+%   \begin{syntax}
+%     \cs{color_model_new:nnn} \Arg{name} \Arg{family} \Arg{params}
+%   \end{syntax}
+%   Creates a new \meta{model} which is derived from the color model \meta{family}.
+%   The latter should be one of
+%   \begin{itemize}
+%     \item \texttt{Separation}
+%   \end{itemize}
+%   (The \meta{family} may be given in mixed case as-in the PDF reference:
+%   internally, case of these strings is folded.)
+%   Depending on the \meta{family}, one or more \meta{params} are mandatory or
+%   optional.
+% \end{function}
+%
+% For a \texttt{Separation} space, there is one \emph{compulsory} key, the
+% \texttt{alternative-space}. This should the form
+% \meta{model}\texttt{:}\meta{values}, for example \texttt{rgb:0.1,0.2,0.3}.
+% This information is used by the PDF application if the \texttt{Separation}
+% is not available, and also creates a second model under the multiple
+% model approach described earlier.
 %
 % \end{documentation}
 %
@@ -398,6 +425,13 @@
 %
 % \subsection{Model conversion}
 %
+% \begin{variable}{\c_@@_numerical_model_clist}
+%   Core models which can be converted to: all are parameter-based.
+%    \begin{macrocode}
+\clist_const:Nn \c_@@_numerical_model_clist { cmyk , gray , rgb }
+%    \end{macrocode}
+% \end{variable}
+%
 % \begin{macro}{\@@_convert:nnN, \@@_convert:VVN}
 % \begin{macro}{\@@_convert:nnnN, \@@_convert:nVnN, \@@_convert:nnVN}
 % \begin{macro}[aux, EXP]
@@ -419,10 +453,10 @@
 \cs_generate_variant:Nn \@@_convert:nnN { VV }
 \cs_new_protected:Npn \@@_convert:nnnN #1#2#3#4
   {
-    \str_if_eq:nnT {#1} { spot } % TO DO!!!
-      { }
     \tl_set:Nx #4
-      { \use:c { @@_convert_ #1 _ #2 :w } #3 ~ 0 ~ 0 ~ 0 \s_@@_stop }
+      {
+        \use:c { @@_convert_ #1 _ #2 :w } #3 ~ 0 ~ 0 ~ 0 \s_@@_stop
+      }
   }
 \cs_generate_variant:Nn \@@_convert:nnnN { nV , nnV }
 \cs_new:Npn \@@_convert_gray_rgb:w #1 ~ #2 \s_@@_stop
@@ -878,8 +912,12 @@
         \exp_after:wN \@@_check_model:nn #1
         \tl_if_eq:NNF \l_@@_model_tl \l_color_fixed_model_tl
           {
-            \@@_convert:VVN \l_@@_model_tl \l_color_fixed_model_tl
-              \l_@@_value_tl
+            \clist_if_in:NVT \c_@@_numerical_model_clist
+              \l_color_fixed_model_tl
+              {
+                \@@_convert:VVN \l_@@_model_tl \l_color_fixed_model_tl
+                  \l_@@_value_tl
+              }
           }
         \tl_set:Nx #1
           { { \l_color_fixed_model_tl } { \l_@@_value_tl } }
@@ -965,6 +1003,11 @@
   }
 \cs_new_protected:Npn \@@_select:nnN #1#2#3
   {
+    \exp_args:Ne \@@_direct_aux:nnN
+      { \tl_to_str:n {#1} } {#2} #3
+  }
+\cs_new_protected:Npn \@@_direct_aux:nnN #1#2#3
+  {
     \cs_if_exist:cTF { @@_parse_model_ #1 :w }
       {
         \tl_set:Nx #3
@@ -1028,7 +1071,7 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_set:nnw #1#2 ! #3 \s_@@_stop
   {
-    \clist_map_inline:nn { cmyk , gray , rgb }
+    \clist_map_inline:Nn \c_@@_numerical_model_clist
       {
         \prop_get:cnNT { l_@@_named_ #2 _prop } {##1} \l_@@_internal_tl
           {
@@ -1253,6 +1296,174 @@
 % \end{macro}
 % \end{macro}
 %
+% \subsection{Additional color models}
+%
+% \begin{variable}{\l_@@_internal_prop}
+%    \begin{macrocode}
+\prop_new:N \l_@@_internal_prop
+%    \end{macrocode}
+% \end{variable}
+%
+% \begin{macro}{\color_model_new:nnn, \@@_model_new:nnn}
+% \begin{macro}{\@@_model_separation:n}
+% \begin{macro}{\@@_model_separation:w}
+% \begin{macro}{\@@_model_separation:nnw}
+% \begin{macro}
+%   {
+%     \@@_model_separation_cmyk:nnnnn ,
+%     \@@_model_separation_gray:nnnnn ,
+%     \@@_model_separation_rgb:nnnnn
+%   }
+%  \begin{macro}{\@@_model_convert:nnn}
+%   Set up a new model: in general this has to be handled by a family-dependent
+%   function. To avoid some \enquote{interesting} questions with casing, we
+%   fold the case of the family name. The key--value list should always be
+%   present, so we convert it up-front to a |prop|, then deal with the detail
+%   on a per-family basis.
+%    \begin{macrocode}
+\cs_new_protected:Npn \color_model_new:nnn #1#2#3
+  {
+    \exp_args:Nee \@@_model_new:nnn
+      { \tl_to_str:n {#1} }
+      { \str_foldcase:n {#2} } {#3}
+  }
+\cs_new_protected:Npn \@@_model_new:nnn #1#2#3
+  {
+    \cs_if_exist:cTF { @@_parse_model_ #1 :w }
+      {
+        \__kernel_msg_error:nnn { color } { model-already-defined } {#1}
+      }
+      {
+        \cs_if_exist:cTF { @@_model_ #2 :n }
+          {
+            \prop_set_from_keyval:Nn \l_@@_internal_prop {#3}
+            \use:c { @@_model_ #2 :n } {#1}
+          }
+          {
+            \__kernel_msg_error:nnn { color } { unknown-model-type } {#2}
+          }
+      }
+  }
+%    \end{macrocode}
+%   For separations, we know that there must be an alternative color space,
+%   and it has to be one of |cmyk|,|gray| or |rgb|. The format
+%   is slightly tricky, so we use |x|-type expansion to sort it.
+%    \begin{macrocode}
+\cs_new_protected:Npx \@@_model_separation:n #1
+  {
+    \prop_get:NnNTF \exp_not:N \l_@@_internal_prop { alternative-space }
+      \exp_not:N \l_@@_internal_tl
+      {
+        \exp_not:N \exp_after:wN \exp_not:N \@@_model_separation:w
+          \exp_not:N \l_@@_internal_tl
+          \token_to_str:N : \token_to_str:N :
+          \exp_not:N \s_@@_stop {#1}
+      }
+      {
+        \__kernel_msg_error:nnn { color }
+          { separation-requires-alternative } {#1}
+      }
+  }
+\use:x
+  {
+    \cs_new_protected:Npn \exp_not:N \@@_model_separation:w
+      ##1 \token_to_str:N : ##2 \token_to_str:N : ##3
+      \exp_not:N \s_@@_stop ##4
+  }
+  {
+    \bool_lazy_or:nnTF
+      { \tl_if_blank_p:n {#1} }
+      { \tl_if_blank_p:n {#2} }
+      {
+        \__kernel_msg_error:nnn { color }
+          { separation-requires-alternative } {#1}
+      }
+      { \@@_model_separation:nnw {#4} {#1} #2 , 0 , 0 , 0 , 0 \s_@@_stop }
+  }
+%    \end{macrocode}
+%   As each alternative space leads to a different requirement for conversion,
+%   and as there are only a small number of choices, we manually split the data
+%   and then set up.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_model_separation:nnw
+  #1#2 #3 , #4 , #5 , #6 , #7 \s_@@_stop
+  {
+    \cs_if_exist:cTF { @@_model_separation_ #2 :nnnnn }
+      {
+        \cs_new:cpn { @@_parse_model_ #1 :w } ##1 , ##2 \s_@@_stop
+          { {#1} { \@@_parse_number:n {##1} } }
+        \cs_new_protected:cpn { @@_backend_ #1 :n } ##1
+          { \@@_backend_family_separation:nn {#1} {##1} }
+        \use:c { @@_model_separation_ #2 :nnnnn }
+          {#1} {#3} {#4} {#5} {#6}
+      }
+      {
+        \__kernel_msg_error:nnn { color }
+          { separation-requires-alternative } {#1}
+      }
+  }
+\cs_new_protected:Npn \@@_model_separation_cmyk:nnnnn #1#2#3#4#5
+  {
+    \cs_new:cpn { @@_convert_ #1 _cmyk:w } ##1 ~ ##2 \s_@@_stop
+      {
+         \fp_eval:n {##1 * #2} ~
+         \fp_eval:n {##1 * #3} ~
+         \fp_eval:n {##1 * #4} ~
+         \fp_eval:n {##1 * #5}
+      }
+    \@@_model_convert:nnn {#1} { cmyk } { rgb }
+    \@@_model_convert:nnn {#1} { cmyk } { gray }
+  }
+\cs_new_protected:Npn \@@_model_separation_rgb:nnnnn #1#2#3#4#5
+  {
+    \cs_new:cpn { @@_convert_ #1 _rgb:w } ##1 ~ ##2 \s_@@_stop
+      {
+         \fp_eval:n {##1 * #2} ~
+         \fp_eval:n {##1 * #3} ~
+         \fp_eval:n {##1 * #4}
+      }
+    \@@_model_convert:nnn {#1} { rgb } { cmyk }
+    \@@_model_convert:nnn {#1} { rgb } { gray }
+  }
+\cs_new_protected:Npn \@@_model_separation_gray:nnnnn #1#2#3#4#5
+  {
+    \cs_new:cpn { @@_convert_ #1 _cmyk:w } ##1 ~ ##2 \s_@@_stop
+      {
+        \fp_eval:n {##1 * #2} ~
+        \fp_eval:n {##1 * #2} ~
+        \fp_eval:n {##1 * #2} ~
+        \fp_eval:n {##1 * #2}
+      }
+    \cs_new:cpn { @@_convert_ #1 _gray:w } ##1 ~ ##2 \s_@@_stop
+      { \fp_eval:n {##1 * #2} }
+    \cs_new:cpn { @@_convert_ #1 _rgb:w } ##1 ~ ##2 \s_@@_stop
+      {
+        \fp_eval:n {##1 * #2} ~
+        \fp_eval:n {##1 * #2} ~
+        \fp_eval:n {##1 * #2}
+      }
+  }
+%    \end{macrocode}
+%   Generic model conversion \emph{via} an alternative intermediate.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_model_convert:nnn #1#2#3
+  {
+    \cs_new:cpx { @@_convert_ #1 _ #3 :w } ##1 ~ ##2 \s_@@_stop
+      {
+        \exp_not:N \exp_args:NNe \exp_not:N \use:nn
+        \exp_not:c { @@_convert_  #2 _ #3 :w }
+          { \exp_not:c { @@_convert_ #1 _ #2 :w } ##1 ~ ##2 \s_@@_stop }
+          \c_space_tl \exp_not:N \s_@@_stop
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 % \subsection{Diagnostics}
 %
 % \begin{macro}{\color_show:n}
@@ -1287,6 +1498,21 @@
 % \subsection{Messages}
 %
 % \begin{macrocode}
+\__kernel_msg_new:nnnn { color } { model-already-defined }
+  { Color~model~'#1'~already~defined. }
+  {
+    LaTeX~was~asked~to~define~a~new~color~model~called~'#1',~but~
+    this~color~model~already~exists.
+  }
+\__kernel_msg_new:nnnn { color } { separation-requires-alternative }
+  { Separation~color~space~'#1'~require~an~alternative~space. }
+  {
+    LaTeX~has~been~asked~to~create~a~separation~color~space,~
+    but~no~\\ \\
+    \iow_indent:n { alternative-space = <model>:<value(s)> }
+    \\ \\
+    key~was~given~with~the~correct~information.
+  }
 \__kernel_msg_new:nnnn { color } { unknown-color }
   { Unknown~color~'#1'. }
   {
@@ -1304,6 +1530,12 @@
   {
     LaTeX~has~been~asked~to~use~a~color~model~called~'#1',~
     but~this~model~is~not~set~up.
+  }
+\__kernel_msg_new:nnnn { color } { unknown-model-type }
+  { Unknown~color~model~type~'#1'. }
+  {
+    LaTeX~has~been~asked~to~use~create~a~new~color~model~of~type~'#1',~
+    but~this~type~of~model~is~not~set~up.
   }
 % \end{macrocode}
 %

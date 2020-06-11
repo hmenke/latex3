@@ -110,4 +110,46 @@
     \color_show:n { foo1 }
   }
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TEST { Creating~new~models }
+  {
+    \OMIT
+      \cs_set_protected:Npn \test:nn #1#2
+        {
+          \color_model_new:nnn { BarTone #1 } { Separation }
+            { alternative-space = {#2} }
+          \color_set:nnn { foo #1 } { BarTone #1 } { 0.5 }
+          \color_show:n { foo #1 }
+        }
+      \cs_generate_variant:Nn \test:nn { nx }
+    \TIMO
+    \test:nx { CMYK } { cmyk \token_to_str:N : 0.1 , 0.2 , 0.3 , 0.4 }
+    \test:nx { RGB  } { rgb  \token_to_str:N : 0.1 , 0.2 , 0.3 }
+    \test:nx { Gray } { gray \token_to_str:N : 0.1 }
+  }
+
+\TEST { Creating~new~models:~errors }
+  {
+    \color_model_new:nnn { BarToneCMYK } { Separation } { }
+    \color_model_new:nnn { foo1 } { nope } { who-cares }
+    \color_model_new:nnn { foo2 } { separation } { }
+    \color_model_new:nnn { foo3 } { separation } { alternative-space }
+    \color_model_new:nnn { foo4 } { separation } { alternative-space = foo }
+  }
+
+\TEST { Converting~new~models }
+  {
+    \OMIT
+    \color_set:nnn { fooCMYK } { BarToneCMYK } { 0.5 }
+    \TIMO
+    \color_export:nnN { fooCMYK } { HTML } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \color_export:nnN { fooCMYK } { space-sep-cmyk } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+    \color_export:nnnN { BarToneCMYK } { 0.125 } { HTML } \l_tmpa_tl
+    \tl_show:N \l_tmpa_tl
+  }
+
 \END
