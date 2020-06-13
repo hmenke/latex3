@@ -1018,9 +1018,9 @@
 %   required, then do some simple maths.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_export_format_annotation:nnN #1#2#3
-  { \@@_export_rgb:nnNN {#1} {#2} #3 \@@_export_HTML:Nw }
+  { \@@_export_rgb:nnNN {#1} {#2} #3 \@@_export_annotation:Nw }
 \cs_new_protected:Npn \@@_export_format_HTML:nnN #1#2#3
-  { \@@_export_rgb:nnNN {#1} {#2}#3 \@@_export_annotation:Nw }
+  { \@@_export_rgb:nnNN {#1} {#2}#3 \@@_export_HTML:Nw }
 \cs_new_protected:Npn \@@_export_rgb:nnNN #1#2#3#4
   {
     \str_if_eq:nnTF {#1} { rgb }

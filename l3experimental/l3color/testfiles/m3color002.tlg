@@ -69,18 +69,6 @@ l. ...  }
 ============================================================
 TEST 3: Exporting colors
 ============================================================
-> \l_tmpa_tl=0000FF.
-<recently read> }
-l. ...  }
-> \l_tmpa_tl=800080.
-<recently read> }
-l. ...  }
-> \l_tmpa_tl=00FFFF.
-<recently read> }
-l. ...  }
-> \l_tmpa_tl=999999.
-<recently read> }
-l. ...  }
 > \l_tmpa_tl=0.0 0.0 1.0.
 <recently read> }
 l. ...  }
@@ -91,6 +79,18 @@ l. ...  }
 <recently read> }
 l. ...  }
 > \l_tmpa_tl=0.6 0.6 0.6.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=0000FF.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=800080.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=00FFFF.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=999999.
 <recently read> }
 l. ...  }
 ============================================================
