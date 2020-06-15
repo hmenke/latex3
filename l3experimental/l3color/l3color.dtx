@@ -272,6 +272,8 @@
 %      of \pkg{expl3}
 %    \item \texttt{HTML} Uppercase two-digit hexadecimal values, expressing
 %      a red-green-blue color; the digits are \emph{not} separated
+%    \item \texttt{space-sep-cmyk} Space-separated cyan-magenta-yellow-black
+%      values
 %    \item \texttt{space-sep-rgb} Space-separated red-green-blue values
 %      suitable for use as a PDF annotation color
 % \end{itemize}
@@ -1022,12 +1024,41 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\@@_export:nnnNN}
+%   A generic auxiliary for cases where only one model is appropriate.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_export:nnnNN #1#2#3#4#5
+  {
+    \str_if_eq:nnTF {#2} {#1}
+      { #5 #4 #3 \s_@@_stop }
+      {
+        \@@_convert:nnnN {#2} {#1} {#3} #4
+        \exp_after:wN #5 \exp_after:wN #4
+          #4 \s_@@_stop
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_export_format_space-sep-cmyk:nnN}
+% \begin{macro}{\@@_export_space-sep-cmyk:Nw}
+%    \begin{macrocode}
+\cs_new_protected:cpx { @@_export_format_space-sep-cmyk:nnN } #1#2#3
+  {
+    \exp_not:N \@@_export:nnnNN { cmyk } {#1} {#2} #3
+      \exp_not:c { @@_export_space-sep-cmyk:Nw }
+  }
+\cs_new_protected:cpn { @@_export_space-sep-cmyk:Nw } #1#2 \s_@@_stop
+  { \tl_set:Nx #1 {#2} }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
 % \begin{macro}
 %   {
 %     \@@_export_format_HTML:nnN          ,
 %     \@@_export_format_space-sep-rgb:nnN
 %   }
-% \begin{macro}{\@@_export_rgb:nnNN}
 % \begin{macro}
 %   {
 %     \@@_export_HTML:Nw          ,
@@ -1038,21 +1069,11 @@
 %   required, then do some simple maths.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_export_format_HTML:nnN #1#2#3
-  { \@@_export_rgb:nnNN {#1} {#2}#3 \@@_export_HTML:Nw }
+  { \@@_export:nnnNN { rgb } {#1} {#2}#3 \@@_export_HTML:Nw }
 \cs_new_protected:cpx { @@_export_format_space-sep-rgb:nnN } #1#2#3
   {
-    \exp_not:N \@@_export_rgb:nnNN {#1} {#2} #3
+    \exp_not:N \@@_export:nnnNN { rgb } {#1} {#2} #3
       \exp_not:c { @@_export_space-sep-rgb:Nw }
-  }
-\cs_new_protected:Npn \@@_export_rgb:nnNN #1#2#3#4
-  {
-    \str_if_eq:nnTF {#1} { rgb }
-      { #4 #3 #2 \s_@@_stop }
-      {
-        \@@_convert:nnnN {#1} { rgb } {#2} #3
-        \exp_after:wN #4 \exp_after:wN #3
-          #3 \s_@@_stop
-      }
   }
 \cs_new_protected:Npn \@@_export_HTML:Nw #1#2 ~ #3 ~ #4 \s_@@_stop
   {
@@ -1072,7 +1093,6 @@
 \cs_new_protected:cpn { @@_export_space-sep-rgb:Nw } #1#2 \s_@@_stop
   { \tl_set:Nx #1 {#2} }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
