@@ -266,10 +266,14 @@
 %
 % Valid export targets are
 % \begin{itemize}
-%    \item \texttt{HTML} Uppercase two-digit hexadecimal values, expressing
-%      a red-green-blue color; the digits are \emph{not} separated
 %    \item \texttt{annotation} Space-separated red-green-blue values
 %      suitable for use as a PDF annotation color
+%    \item \texttt{backend} Two brace groups: the first containing the
+%      model, the second containing space-separated values appropriate
+%      for the model; this is the format required by backend functions
+%      of \pkg{expl3}
+%    \item \texttt{HTML} Uppercase two-digit hexadecimal values, expressing
+%      a red-green-blue color; the digits are \emph{not} separated
 % \end{itemize}
 %
 % \begin{function}{\color_export:nnN}
@@ -1008,6 +1012,14 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\@@_export_format_backend:nnN}
+%   Simple.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_export_format_backend:nnN #1#2#3
+  { \tl_set:Nn #3 { {#1} {#2} } }
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\@@_export_format_annotation:nnN, \@@_export_format_HTML:nnN}
