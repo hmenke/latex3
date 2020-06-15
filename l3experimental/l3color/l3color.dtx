@@ -266,14 +266,14 @@
 %
 % Valid export targets are
 % \begin{itemize}
-%    \item \texttt{annotation} Space-separated red-green-blue values
-%      suitable for use as a PDF annotation color
 %    \item \texttt{backend} Two brace groups: the first containing the
 %      model, the second containing space-separated values appropriate
 %      for the model; this is the format required by backend functions
 %      of \pkg{expl3}
 %    \item \texttt{HTML} Uppercase two-digit hexadecimal values, expressing
 %      a red-green-blue color; the digits are \emph{not} separated
+%    \item \texttt{space-sep-rgb} Space-separated red-green-blue values
+%      suitable for use as a PDF annotation color
 % \end{itemize}
 %
 % \begin{function}{\color_export:nnN}
@@ -1022,17 +1022,28 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\@@_export_format_annotation:nnN, \@@_export_format_HTML:nnN}
+% \begin{macro}
+%   {
+%     \@@_export_format_HTML:nnN          ,
+%     \@@_export_format_space-sep-rgb:nnN
+%   }
 % \begin{macro}{\@@_export_rgb:nnNN}
-% \begin{macro}{\@@_export_annotation:Nw, \@@_export_HTML:Nw}
+% \begin{macro}
+%   {
+%     \@@_export_HTML:Nw          ,
+%     \@@_export_space-sep-rgb:Nw
+%   }
 % \begin{macro}[EXP]{\@@_export_HTML:n}
 %   \textsc{html} values must be given in |rgb|: we force conversion if
 %   required, then do some simple maths.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_export_format_annotation:nnN #1#2#3
-  { \@@_export_rgb:nnNN {#1} {#2} #3 \@@_export_annotation:Nw }
 \cs_new_protected:Npn \@@_export_format_HTML:nnN #1#2#3
   { \@@_export_rgb:nnNN {#1} {#2}#3 \@@_export_HTML:Nw }
+\cs_new_protected:cpx { @@_export_format_space-sep-rgb:nnN } #1#2#3
+  {
+    \exp_not:N \@@_export_rgb:nnNN {#1} {#2} #3
+      \exp_not:c { @@_export_space-sep-rgb:Nw }
+  }
 \cs_new_protected:Npn \@@_export_rgb:nnNN #1#2#3#4
   {
     \str_if_eq:nnTF {#1} { rgb }
@@ -1043,8 +1054,6 @@
           #3 \s_@@_stop
       }
   }
-\cs_new_protected:Npn \@@_export_annotation:Nw #1#2 \s_@@_stop
-  { \tl_set:Nx #1 {#2} }
 \cs_new_protected:Npn \@@_export_HTML:Nw #1#2 ~ #3 ~ #4 \s_@@_stop
   {
     \tl_set:Nx #1
@@ -1060,6 +1069,8 @@
       { 00 }
       { \int_to_Hex:n { \fp_to_int:n { #1 * 255 } } }
   }
+\cs_new_protected:cpn { @@_export_space-sep-rgb:Nw } #1#2 \s_@@_stop
+  { \tl_set:Nx #1 {#2} }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

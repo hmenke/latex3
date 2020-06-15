@@ -54,7 +54,7 @@
 \TEST { Exporting~colors }
   {
     \clist_map_inline:nn
-      { annotation , backend , HTML }
+      { backend , HTML , space-sep-rgb }
       {
         \color_export:nnN { blue } {#1} \l_tmpa_tl
         \tl_show:N \l_tmpa_tl
