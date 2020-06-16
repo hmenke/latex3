@@ -64,12 +64,14 @@ The color foo3 has the properties:
 <recently read> }
 l. ...  }
 Defining \l__color_named_foo4_tl on line ...
+Defining \l__color_named_foo4_prop on line ...
 The color foo4 has the properties:
 >  model  =>  rgb
 >  value  =>  0.125 0.125 0.75.
 <recently read> }
 l. ...  }
 Defining \l__color_named_foo5_tl on line ...
+Defining \l__color_named_foo5_prop on line ...
 The color foo5 has the properties:
 >  model  =>  cmyk
 >  value  =>  0.02 0.18 0.8 0.

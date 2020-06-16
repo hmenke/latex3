@@ -955,20 +955,6 @@
 %    \end{macrocode}
 % \end{variable}
 %
-% \begin{macro}{\@@_store:Nn}
-%   Store the named color unless it has an invalid name.
-%     \begin{macrocode}
-\cs_new_protected:Npn \@@_store:Nn #1#2
-  {
-    \str_if_eq:nnF {#2} { . }
-      {
-        \tl_clear_new:c { l_@@_named_ #2 _tl }
-        \tl_set_eq:cN { l_@@_named_ #2 _tl } #1
-      }
-  }
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}{\color_set:nn}
 % \begin{macro}{\color_set:nnn}
 % \begin{macro}{\@@_set:nw}
@@ -981,19 +967,23 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \color_set:nn #1#2
   {
-    \@@_parse:nN {#2} \l_@@_named_tl
-    \@@_store:Nn \l_@@_named_tl {#1}
+    \str_if_eq:nnF {#1} { . }
+      {
+        \@@_parse:nN {#2} \l_@@_named_tl
+        \exp_args:Nnx \@@_set_store:nn {#1}
+          { \exp_after:wN \use_i:nn \l_@@_named_tl }
+      }
   }
 \cs_new_protected:Npn \color_set:nnn #1#2#3
-  { \@@_set:nw {#1} #2 / / \s_@@_mark #3 / / \s_@@_stop }
+  {
+    \str_if_eq:nnF {#1} { . }
+      { \@@_set:nw {#1} #2 / / \s_@@_mark #3 / / \s_@@_stop }
+  }
 \cs_new_protected:Npn \@@_set:nw
   #1#2 / #3 / #4 \s_@@_mark #5 / #6 / #7 \s_@@_stop
   {
     \@@_select:nnN {#2} {#5} \l_@@_named_tl
-    \@@_store:Nn \l_@@_named_tl {#1}
-    \prop_clear_new:c { l_@@_named_ #1 _prop }
-    \prop_put:cnx { l_@@_named_ #1 _prop } {#2}
-      { \exp_after:wN \use_ii:nn \l_@@_named_tl }
+    \@@_set_store:nn {#1} {#2}
     \@@_set_loop:nw {#1} #3 / #4 \s_@@_mark #6 / #7 \s_@@_stop
   }
 \cs_new_protected:Npn \@@_set_loop:nw
@@ -1006,6 +996,14 @@
           { \exp_after:wN \use_ii:nn \l_@@_named_tl }
         \@@_set_loop:nw {#1} #3 \s_@@_mark #5 \s_@@_stop
       }
+  }
+\cs_new_protected:Npn \@@_set_store:nn #1#2
+  {
+    \tl_clear_new:c { l_@@_named_ #1 _tl }
+    \tl_set_eq:cN { l_@@_named_ #1 _tl } \l_@@_named_tl
+    \prop_clear_new:c { l_@@_named_ #1 _prop }
+    \prop_put:cnx { l_@@_named_ #1 _prop } {#2}
+      { \exp_after:wN \use_ii:nn \l_@@_named_tl }
   }
 \cs_new_protected:Npn \color_set_eq:nn #1#2
   {
