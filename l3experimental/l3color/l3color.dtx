@@ -1012,14 +1012,24 @@
     \@@_if_defined:nTF {#2}
       {
         \tl_clear_new:c { l_@@_named_ #1 _tl }
+        \prop_clear_new:c { l_@@_named_ #1 _prop }
         \str_if_eq:nnTF {#2} { . }
-          { \tl_set_eq:cN { l_@@_named_ #1 _tl } \l_@@_current_tl }
-          { \tl_set_eq:cc { l_@@_named_ #1 _tl } { l_@@_named_ #2 _tl } }
+          {
+            \tl_set_eq:cN { l_@@_named_ #1 _tl } \l_@@_current_tl
+            \prop_put:cxx { l_@@_named_ #1 _prop }
+              { \exp_after:wN \use_i:nn  \l_@@_current_tl }
+              { \exp_after:wN \use_ii:nn \l_@@_current_tl }
+          }
+          {
+            \tl_set_eq:cc { l_@@_named_ #1 _tl } { l_@@_named_ #2 _tl }
+            \prop_set_eq:cc { l_@@_named_ #1 _prop } { l_@@_named_ #2 _prop }
+          }
       }
       {
         \__kernel_msg_error:nnn { color } { unknown-color } {#2}
       }
   }
+\cs_generate_variant:Nn \prop_put:Nnn { cxx }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}

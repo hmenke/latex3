@@ -113,6 +113,7 @@ l. ...  }
 TEST 6: Copying the current color
 ============================================================
 Defining \l__color_named_foo_tl on line ...
+Defining \l__color_named_foo_prop on line ...
 The color foo has the properties:
 >  model  =>  cmyk
 >  value  =>  0.25 0.75 0 0.
