@@ -84,7 +84,33 @@ The color test has the properties:
 l. ...  }
 ============================================================
 ============================================================
-TEST 3: Showing multiple models
+TEST 3: Mixing multiple models
+============================================================
+Defining \l__color_named_myrgbcmyk_tl on line ...
+Defining \l__color_named_myrgbcmyk_prop on line ...
+Defining \l__color_named_mycmykrgb_tl on line ...
+Defining \l__color_named_mycmykrgb_prop on line ...
+Defining \l__color_named_myexpr1_tl on line ...
+Defining \l__color_named_myexpr1_prop on line ...
+The color myexpr1 has the properties:
+>  model  =>  rgb
+>  value  =>  1 0 1
+>  rgb  =>  1 0 1
+>  cmyk  =>  1.0 0.0 0.0 1.0.
+<recently read> }
+l. ...  }
+Defining \l__color_named_myexpr2_tl on line ...
+Defining \l__color_named_myexpr2_prop on line ...
+The color myexpr2 has the properties:
+>  model  =>  cmyk
+>  value  =>  1 0 0 1
+>  cmyk  =>  1 0 0 1
+>  rgb  =>  1.0 0.0 1.0.
+<recently read> }
+l. ...  }
+============================================================
+============================================================
+TEST 4: Showing multiple models
 ============================================================
 The color foo1 has the properties:
 >  model  =>  cmyk

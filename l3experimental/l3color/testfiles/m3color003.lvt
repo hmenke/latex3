@@ -72,6 +72,18 @@
     \color_show:n { test }
   }
 
+\TEST { Mixing~multiple~models }
+  {
+    \color_set:nnn { myrgbcmyk } { rgb / cmyk }
+      { 1 , 0 , 1 / 1 , 0 , 0 , 1 }
+    \color_set:nnn { mycmykrgb } { cmyk / rgb }
+      { 1 , 0 , 0 , 1 / 1 , 0 , 1 }
+    \color_set:nn { myexpr1 } { myrgbcmyk!30!mycmykrgb }
+    \color_show:n { myexpr1 }
+    \color_set:nn { myexpr2 } { mycmykrgb!30!myrgbcmyk }
+    \color_show:n { myexpr2 }
+  }
+
 \TEST { Showing~multiple~models }
   {
     \color_set:nnn { foo1 } { cmyk / rgb }

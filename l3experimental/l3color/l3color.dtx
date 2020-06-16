@@ -956,6 +956,7 @@
 % \end{variable}
 %
 % \begin{macro}{\color_set:nn}
+% \begin{macro}{\@@_set:nnw}
 % \begin{macro}{\color_set:nnn}
 % \begin{macro}{\@@_set:nw}
 % \begin{macro}{\@@_set_loop:nw}
@@ -972,6 +973,34 @@
         \@@_parse:nN {#2} \l_@@_named_tl
         \exp_args:Nnx \@@_set_store:nn {#1}
           { \exp_after:wN \use_i:nn \l_@@_named_tl }
+        \@@_set:nnw {#1} #2 ! \s_@@_stop
+      }
+  }
+%    \end{macrocode}
+%   When setting an expression-based color, there could be multiple model
+%   data available for one or more of the input colors. Where that is true for
+%   the \emph{first} named color in an expression, we re-parse the expression
+%   when they are also parameter-based: only |cmyk|, |gray| and |rgb| make
+%   any sense here. There is a bit of a performance hit but this should be
+%   rare and taking place during set-up.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_set:nnw #1#2 ! #3 \s_@@_stop
+  {
+    \clist_map_inline:nn { cmyk , gray , rgb }
+      {
+        \prop_get:cnNT { l_@@_named_ #2 _prop } {##1} \l_@@_named_tl
+          {
+            \prop_if_in:cnF { l_@@_named_ #1 _prop } {##1}
+              {
+                \group_begin:
+                  \tl_set_eq:cN { l_@@_named_ #2_ tl } \l_@@_named_tl
+                  \@@_parse:nN {#2} \l_@@_named_tl
+                \exp_args:NNNV \group_end:
+                \tl_set:Nn \l_@@_named_tl \l_@@_named_tl
+                \prop_put:cnV { l_@@_named_ #1 _prop } {##1}
+                  \l_@@_named_tl
+              }
+          }
       }
   }
 \cs_new_protected:Npn \color_set:nnn #1#2#3
@@ -1029,6 +1058,7 @@
   }
 \cs_generate_variant:Nn \prop_put:Nnn { cxx }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
