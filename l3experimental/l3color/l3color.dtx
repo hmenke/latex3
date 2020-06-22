@@ -343,8 +343,8 @@
 % functions).
 %
 % Since there is no need to manipulate colors \emph{en masse}, each is stored
-% in a separate token list variable, rather than the alternative of using a
-% single property list for all names.
+% in a two-part structure: a \texttt{prop} for the colors themselves, and a
+% \texttt{tl} for the default model for each color.
 %
 % \subsection{Setup}
 %
@@ -369,36 +369,31 @@
 %    \begin{macrocode}
 \prg_new_conditional:Npnn \@@_if_defined:n #1 { T, F, TF }
   {
-    \tl_if_exist:cTF { l_@@_named_ #1 _tl }
+    \prop_if_exist:cTF { l_@@_named_ #1 _prop }
       \prg_return_true:
       \prg_return_false:
   }
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}[EXP]{\@@_model:N, \@@_values:N}
+%   Simple abstractions.
+%    \begin{macrocode}
+\cs_new:Npn \@@_model:N #1 { \exp_after:wN \use_i:nn #1 }
+\cs_new:Npn \@@_values:N #1 { \exp_after:wN \use_ii:nn #1 }
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\@@_extract:nNN, \@@_extract:VNN}
-% \begin{macro}{\@@_extract:NNnn}
-%   Split the model and color from a named color, and store the two. No test
-%   for the existence of the color: that is assumed to be the case (this
-%   is internal only). Somewhat \enquote{old-fashioned} but should be quite
-%   fast.
+%   Recover the values for the standard model for a color.
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_extract:nNN #1#2#3
   {
-    \exp_after:wN \exp_after:wN \exp_after:wN
-      \@@_extract:NNnn
-      \exp_after:wN \exp_after:wN \exp_after:wN #2
-      \exp_after:wN \exp_after:wN \exp_after:wN #3
-        \cs:w l_@@_named_ #1 _tl \cs_end:
+    \tl_set_eq:Nc #2 { l_@@_named_ #1 _tl }
+    \prop_get:cVN { l_@@_named_ #1 _prop } #2 #3
   }
 \cs_generate_variant:Nn \@@_extract:nNN { V }
-\cs_new_protected:Npn \@@_extract:NNnn #1#2#3#4
-  {
-    \tl_set:Nn #1 {#3}
-    \tl_set:Nn #2 {#4}
-  }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 % \subsection{Model conversion}
@@ -490,6 +485,7 @@
 %
 % \begin{macro}{\@@_parse:nN}
 % \begin{macro}{\@@_parse_aux:nN}
+% \begin{macro}{\@@_parse_eq:Nn}
 % \begin{macro}{\@@_parse:Nw}
 % \begin{macro}{\@@_parse_loop_init:Nnn}
 % \begin{macro}{\@@_parse_loop:w}
@@ -508,13 +504,18 @@
 %   otherwise expands, then starts working through the expression itself.
 %   At the end, we apply the payload.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_parse:nN #1#2
+\cs_new_protected:Npx \@@_parse:nN #1#2
   {
 %<*package>
-    \@@_backend_pickup:N \l_@@_current_tl
-    \tl_set_eq:cN { l_@@_named_ . _tl } \l_@@_current_tl
+    \exp_not:N \@@_backend_pickup:N \exp_not:N \l_@@_current_tl
+    \tl_set:Nx \exp_not:c { l_@@_named_ . _tl }
+      { \exp_not:N \@@_model:N \exp_not:N \l_@@_current_tl }
+    \prop_put:NVx \exp_not:c { l_@@_named_ . _prop }
+      \exp_not:c { l_@@_named_ . _tl }
+      { \exp_not:N \@@_values:N \exp_not:N \l_@@_current_tl }
 %</package>
-    \exp_args:Ne \@@_parse_aux:nN { \tl_to_str:n {#1} } #2
+    \exp_not:N \exp_args:Ne \exp_not:N \@@_parse_aux:nN
+      { \exp_not:N \tl_to_str:n {#1} } #2
   }
 %    \end{macrocode}
 %   Before going to all of the effort of parsing an expression, these two
@@ -523,22 +524,33 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_parse_aux:nN #1#2
   {
-    \tl_if_exist:cTF { l_@@_named_ #1 _tl }
-      { \tl_set_eq:Nc #2 { l_@@_named_ #1 _tl } }
+    \tl_if_exist:cTF { l_@@_named_ #1 _prop }
+      { \@@_parse_set_eq:Nn #2 {#1} }
       { \@@_parse:Nw #2#1 ! \s_@@_stop }
     \@@_check_model:N #2
+  }
+\cs_new_protected:Npn \@@_parse_set_eq:Nn #1#2
+  {
+    \prop_get:cvN
+      { l_@@_named_ #2 _prop } { l_@@_named_ #2 _tl }
+      \l_@@_internal_tl
+    \tl_set:Nx #1
+      {
+        { \tl_use:c { l_@@_named_ #2 _tl } }
+        { \l_@@_internal_tl }
+      }     
   }
 \cs_new_protected:Npn \@@_parse:Nw #1#2 ! #3 \s_@@_stop
   {
     \@@_if_defined:nTF {#2}
       {
         \tl_if_blank:nTF {#3}
-          { \tl_set_eq:Nc #1 { l_@@_named_ #2 _tl } }
+          { \@@_parse_set_eq:Nn #1 {#2} }
           { \@@_parse_loop_init:Nnn #1 {#2} {#3} }
       }
       {
         \__kernel_msg_error:nnn { color } { unknown-color } {#2}
-        \tl_set_eq:NN \l_@@_current_tl \l_@@_named_black_tl
+        \tl_set:Nn \l_@@_current_tl { { gray } { 0 } }
       }
   }
 %    \end{macrocode}
@@ -680,6 +692,7 @@
     \fp_eval:n { #5 * #1 + #9 * ( 1 - #1 ) }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -865,10 +878,14 @@
 %   will therefore always be available. The finalisation is separate from the
 %   main function so it can also be applied to \emph{e.g.}~page color.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_select:
+\cs_new_protected:Npx \@@_select:
   {
-    \tl_set_eq:cN { l_@@_named_ . _tl } \l_@@_current_tl
-    \@@_select:N \l_@@_current_tl
+    \tl_set:Nx \exp_not:c { l_@@_named_ . _tl }
+      { \exp_not:N \@@_model:N \exp_not:N \l_@@_current_tl }
+    \prop_put:NVx \exp_not:c { l_@@_named_ . _prop }
+      \exp_not:c { l_@@_named_ . _tl }
+      { \exp_not:N \@@_values:N \exp_not:N \l_@@_current_tl }
+    \@@_select:N \exp_not:N \l_@@_current_tl
   }
 %    \end{macrocode}
 % \end{macro}
@@ -958,7 +975,6 @@
 % \begin{macro}{\color_set:nn}
 % \begin{macro}{\@@_set:nnw}
 % \begin{macro}{\color_set:nnn}
-% \begin{macro}{\@@_set:nw}
 % \begin{macro}{\@@_set_loop:nw}
 % \begin{macro}{\color_set_eq:nn}
 %   Defining named colors means working through the model list and saving
@@ -971,8 +987,12 @@
     \str_if_eq:nnF {#1} { . }
       {
         \@@_parse:nN {#2} \l_@@_named_tl
-        \exp_args:Nnx \@@_set_store:nn {#1}
-          { \exp_after:wN \use_i:nn \l_@@_named_tl }
+        \tl_clear_new:c { l_@@_named_ #1 _tl }
+        \tl_set:cx { l_@@_named_ #1 _tl }
+          { \@@_model:N \l_@@_named_tl }
+        \prop_clear_new:c { l_@@_named_ #1 _prop }
+        \prop_put:cvx { l_@@_named_ #1 _prop } { l_@@_named_ #1 _tl }
+          { \@@_values:N \l_@@_named_tl }
         \@@_set:nnw {#1} #2 ! \s_@@_stop
       }
   }
@@ -988,17 +1008,17 @@
   {
     \clist_map_inline:nn { cmyk , gray , rgb }
       {
-        \prop_get:cnNT { l_@@_named_ #2 _prop } {##1} \l_@@_named_tl
+        \prop_get:cnNT { l_@@_named_ #2 _prop } {##1} \l_@@_internal_tl
           {
             \prop_if_in:cnF { l_@@_named_ #1 _prop } {##1}
               {
                 \group_begin:
-                  \tl_set_eq:cN { l_@@_named_ #2_ tl } \l_@@_named_tl
-                  \@@_parse:nN {#2} \l_@@_named_tl
+                  \tl_set:cn { l_@@_named_ #2 _tl } {##1}
+                  \@@_parse:nN {#2} \l_@@_internal_tl
                 \exp_args:NNNV \group_end:
-                \tl_set:Nn \l_@@_named_tl \l_@@_named_tl
-                \prop_put:cnV { l_@@_named_ #1 _prop } {##1}
-                  \l_@@_named_tl
+                \tl_set:Nn \l_@@_internal_tl \l_@@_internal_tl
+                \prop_put:cnx { l_@@_named_ #1 _prop } {##1}
+                  { \@@_values:N \l_@@_internal_tl }
               }
           }
       }
@@ -1006,14 +1026,11 @@
 \cs_new_protected:Npn \color_set:nnn #1#2#3
   {
     \str_if_eq:nnF {#1} { . }
-      { \@@_set:nw {#1} #2 / / \s_@@_mark #3 / / \s_@@_stop }
-  }
-\cs_new_protected:Npn \@@_set:nw
-  #1#2 / #3 / #4 \s_@@_mark #5 / #6 / #7 \s_@@_stop
-  {
-    \@@_select:nnN {#2} {#5} \l_@@_named_tl
-    \@@_set_store:nn {#1} {#2}
-    \@@_set_loop:nw {#1} #3 / #4 \s_@@_mark #6 / #7 \s_@@_stop
+      {
+        \tl_clear_new:c { l_@@_named_ #1 _tl }
+        \prop_clear_new:c { l_@@_named_ #1 _prop }
+        \@@_set_loop:nw {#1} #2 / / \s_@@_mark #3 / / \s_@@_stop
+      }
   }
 \cs_new_protected:Npn \@@_set_loop:nw
   #1#2 / #3 \s_@@_mark #4 / #5 \s_@@_stop
@@ -1021,18 +1038,13 @@
     \tl_if_blank:nF {#2}
       {
         \@@_select:nnN {#2} {#4} \l_@@_named_tl
-        \prop_put:cnx { l_@@_named_ #1 _prop } {#2}
-          { \exp_after:wN \use_ii:nn \l_@@_named_tl }
+        \tl_set:Nx \l_@@_internal_tl { \@@_model:N \l_@@_named_tl }
+        \tl_if_empty:cT { l_@@_named_ #1 _tl }
+          { \tl_set_eq:cN { l_@@_named_ #1 _tl } \l_@@_internal_tl }
+        \prop_put:cVx { l_@@_named_ #1 _prop } \l_@@_internal_tl
+          { \@@_values:N \l_@@_named_tl }
         \@@_set_loop:nw {#1} #3 \s_@@_mark #5 \s_@@_stop
       }
-  }
-\cs_new_protected:Npn \@@_set_store:nn #1#2
-  {
-    \tl_clear_new:c { l_@@_named_ #1 _tl }
-    \tl_set_eq:cN { l_@@_named_ #1 _tl } \l_@@_named_tl
-    \prop_clear_new:c { l_@@_named_ #1 _prop }
-    \prop_put:cnx { l_@@_named_ #1 _prop } {#2}
-      { \exp_after:wN \use_ii:nn \l_@@_named_tl }
   }
 \cs_new_protected:Npn \color_set_eq:nn #1#2
   {
@@ -1042,10 +1054,10 @@
         \prop_clear_new:c { l_@@_named_ #1 _prop }
         \str_if_eq:nnTF {#2} { . }
           {
-            \tl_set_eq:cN { l_@@_named_ #1 _tl } \l_@@_current_tl
-            \prop_put:cxx { l_@@_named_ #1 _prop }
-              { \exp_after:wN \use_i:nn  \l_@@_current_tl }
-              { \exp_after:wN \use_ii:nn \l_@@_current_tl }
+            \tl_set:cx { l_@@_named_ #1 _tl }
+              { \@@_model:N \l_@@_current_tl }
+            \prop_put:cvx { l_@@_named_ #1 _prop } { l_@@_named_ #1 _tl }
+              { \@@_values:N \l_@@_current_tl }
           }
           {
             \tl_set_eq:cc { l_@@_named_ #1 _tl } { l_@@_named_ #2 _tl }
@@ -1056,10 +1068,7 @@
         \__kernel_msg_error:nnn { color } { unknown-color } {#2}
       }
   }
-\cs_generate_variant:Nn \prop_put:Nnn { cxx }
 %    \end{macrocode}
-% \end{macro}
-% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1078,12 +1087,13 @@
 \color_set:nnn { blue }  { rgb } { 0 , 0 , 1 }
 % \end{macrocode}
 %
-% \begin{variable}{\l_@@_named_._tl}
+% \begin{variable}{\l_@@_named_._prop, \l_@@_named_._tl}
 %   A special named color: this is always defined though not fixed in
 %   definition.
 %    \begin{macrocode}
+\prop_new:c { l_@@_named_._prop }
 \tl_new:c { l_@@_named_._tl }
-\tl_set_eq:cN { l_@@_named_._tl } \l_@@_current_tl
+\tl_set:cx { l_@@_named_._tl } { \@@_model:N \l_@@_current_tl }
 %    \end{macrocode}
 % \end{variable}
 %
@@ -1206,7 +1216,7 @@
 % \subsection{Diagnostics}
 %
 % \begin{macro}{\color_show:n}
-% \begin{macro}{\@@_show:nn}
+% \begin{macro}{\@@_show:n}
 %   Extract the information about a color and format for the user: the approach
 %   is similar to the keys module here.
 %    \begin{macrocode}
@@ -1217,22 +1227,18 @@
       {
         \@@_if_defined:nT {#1}
           {
-            \exp_last_unbraced:Nv \@@_show:nn { l_@@_named_ #1 _tl }
-            \int_compare:nNnT { \prop_count:c { l_@@_named_ #1 _prop } } > 1
-              {
-                \prop_map_function:cN
-                  { l_@@_named_ #1 _prop }
-                  \msg_show_item_unbraced:nn
-              }
+            \exp_args:Nv \@@_show:n { l_@@_named_ #1 _tl }
+            \prop_map_function:cN
+              { l_@@_named_ #1 _prop }
+              \msg_show_item_unbraced:nn
           }
       }
       { }
       { }
   }
-\cs_new:Npn \@@_show:nn #1#2
+\cs_new:Npn \@@_show:n #1
   {
     \msg_show_item_unbraced:nn { model } {#1}
-    \msg_show_item_unbraced:nn { value } {#2}
   }
 %    \end{macrocode}
 % \end{macro}
