@@ -79,12 +79,12 @@ Defining \l__color_named_test_tl on line ...
 Defining \l__color_named_test_prop on line ...
 The color test has the properties:
 >  model  =>  cmyk
->  value  =>  0.55 0.1 0.15 0.2.
+>  cmyk  =>  0.55 0.1 0.15 0.2.
 <recently read> }
 l. ...  }
 The color test has the properties:
 >  model  =>  rgb
->  value  =>  0.05 0.05 0.6.
+>  rgb  =>  0.05 0.05 0.6.
 <recently read> }
 l. ...  }
 ============================================================
@@ -99,7 +99,6 @@ Defining \l__color_named_myexpr1_tl on line ...
 Defining \l__color_named_myexpr1_prop on line ...
 The color myexpr1 has the properties:
 >  model  =>  rgb
->  value  =>  1 0 1
 >  rgb  =>  1 0 1
 >  cmyk  =>  1.0 0.0 0.0 1.0.
 <recently read> }
@@ -108,7 +107,6 @@ Defining \l__color_named_myexpr2_tl on line ...
 Defining \l__color_named_myexpr2_prop on line ...
 The color myexpr2 has the properties:
 >  model  =>  cmyk
->  value  =>  1 0 0 1
 >  cmyk  =>  1 0 0 1
 >  rgb  =>  1.0 0.0 1.0.
 <recently read> }
@@ -119,7 +117,6 @@ TEST 4: Showing multiple models
 ============================================================
 The color foo1 has the properties:
 >  model  =>  cmyk
->  value  =>  0.1 0.2 0.3 0.4
 >  cmyk  =>  0.1 0.2 0.3 0.4
 >  rgb  =>  0.1 0.1 0.2.
 <recently read> }
