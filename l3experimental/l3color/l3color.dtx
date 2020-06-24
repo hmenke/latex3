@@ -486,6 +486,7 @@
 % \begin{macro}{\@@_parse:nN}
 % \begin{macro}{\@@_parse_aux:nN}
 % \begin{macro}{\@@_parse_eq:Nn}
+% \begin{macro}{\@@_parse_eq:nNn}
 % \begin{macro}{\@@_parse:Nw}
 % \begin{macro}{\@@_parse_loop_init:Nnn}
 % \begin{macro}{\@@_parse_loop:w}
@@ -531,14 +532,34 @@
   }
 \cs_new_protected:Npn \@@_parse_set_eq:Nn #1#2
   {
-    \prop_get:cvN
-      { l_@@_named_ #2 _prop } { l_@@_named_ #2 _tl }
-      \l_@@_internal_tl
-    \tl_set:Nx #1
+    \tl_if_empty:NTF \l_color_fixed_model_tl
+       { \exp_args:Nv \@@_parse_set_eq:nNn { l_@@_named_ #2 _tl } }
+       { \exp_args:NV \@@_parse_set_eq:nNn \l_color_fixed_model_tl }
+         #1 {#2}
+  }
+%    \end{macrocode}
+%    Here, we have to allow for the case where there is a fixed model:
+%    that can't be swept up by generic conversion as we are dealing with a
+%    named color.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_set_eq:nNn #1#2#3
+  {
+    \prop_get:cnNTF
+      { l_@@_named_ #3 _prop } {#1}
+      \l_@@_value_tl
+      { \tl_set:Nx #2 { {#1} { \l_@@_value_tl } } }
       {
-        { \tl_use:c { l_@@_named_ #2 _tl } }
-        { \l_@@_internal_tl }
-      }     
+        \tl_set_eq:Nc \l_@@_model_tl { l_@@_named_ #3 _tl }
+        \prop_get:cVN { l_@@_named_ #3 _prop } \l_@@_model_tl
+          \l_@@_value_tl
+         \@@_convert:nnN
+           \l_@@_model_tl {#1} \l_@@_value_tl
+        \tl_set:Nx #2
+          {
+            {#1}
+            { \l_@@_value_tl }
+          }
+      }
   }
 \cs_new_protected:Npn \@@_parse:Nw #1#2 ! #3 \s_@@_stop
   {
@@ -692,6 +713,7 @@
     \fp_eval:n { #5 * #1 + #9 * ( 1 - #1 ) }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1106,8 +1128,13 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \color_export:nnN #1#2#3
   {
-    \@@_parse:nN {#1} #3
-    \@@_export:nN {#2} #3
+    \group_begin:
+      \tl_if_exist:cT { c_@@_export_ #2 _tl }
+        { \tl_set_eq:Nc \l_color_fixed_model_tl { c_@@_export_ #2 _tl } }
+      \@@_parse:nN {#1} #3
+      \@@_export:nN {#2} #3
+    \exp_args:NNNV \group_end:
+    \tl_set:Nn #3 #3
   }
 \cs_new_protected:Npn \color_export:nnnN #1#2#3#4
   {
@@ -1155,6 +1182,19 @@
   }
 %    \end{macrocode}
 % \end{macro}
+%
+% \begin{variable}
+%   {
+%     \c_@@_export_HTML_tl           ,
+%     \c_@@_export_space-sep-cmyk_tl ,
+%     \c_@@_export_space-sep-rgb_tl
+%   }
+%    \begin{macrocode}
+\tl_const:Nn \c_@@_export_HTML_tl { rgb }
+\tl_const:cn { c_@@_export_space-sep-cmyk_tl } { cmyk }
+\tl_const:cn { c_@@_export_space-sep-rgb_tl } { rgb }
+%    \end{macrocode}
+% \end{variable}
 %
 % \begin{macro}{\@@_export_format_space-sep-cmyk:nnN}
 % \begin{macro}{\@@_export_space-sep-cmyk:Nw}

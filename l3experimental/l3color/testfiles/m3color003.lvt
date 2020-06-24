@@ -84,6 +84,25 @@
     \color_show:n { myexpr2 }
   }
 
+\TEST { Exporting~multiple~models }
+  {
+    \OMIT
+    \color_set:nnn { myA } { rgb / cmyk }
+      { 0.3 , 0.3 , 0.3 / 1 , 0 , 0 , 0 }
+    \color_set:nnn { myB } { cmyk / rgb }
+      { 1 , 0 , 0 , 0 / 0.3 , 0.3 , 0.3 }
+    \TIMO
+    \clist_map_inline:nn
+      { backend , HTML , space-sep-cmyk , space-sep-rgb }
+      {
+        \color_export:nnN { myA } {#1} \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+        \color_export:nnN { myB } {#1} \l_tmpa_tl
+        \tl_show:N \l_tmpa_tl
+      }
+  }
+
+
 \TEST { Showing~multiple~models }
   {
     \color_set:nnn { foo1 } { cmyk / rgb }

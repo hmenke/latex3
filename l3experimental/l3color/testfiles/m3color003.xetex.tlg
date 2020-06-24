@@ -108,7 +108,35 @@ The color myexpr2 has the properties:
 l. ...  }
 ============================================================
 ============================================================
-TEST 4: Showing multiple models
+TEST 4: Exporting multiple models
+============================================================
+> \l_tmpa_tl={rgb}{0.3 0.3 0.3}.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl={cmyk}{1.0 0.0 0.0 0.0}.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=4C4C4C.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=4C4C4C.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=1.0 0.0 0.0 0.0.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=1.0 0.0 0.0 0.0.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=0.3 0.3 0.3.
+<recently read> }
+l. ...  }
+> \l_tmpa_tl=0.3 0.3 0.3.
+<recently read> }
+l. ...  }
+============================================================
+============================================================
+TEST 5: Showing multiple models
 ============================================================
 The color foo1 has the properties:
 >  model  =>  cmyk
