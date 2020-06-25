@@ -163,4 +163,17 @@
     \color_show:n { foo }
   }
 
+\TEST { Mixing~separation:~failures }
+  {
+    \OMIT
+    \color_set:nnn { fooCMYK } { BarToneCMYK } { 1.0 }
+    \TIMO
+    \color_set:nn { foo } { fooCMYK!35!black }
+    \color_show:n { foo }
+    \color_set:nn { foo } { fooCMYK!35!cyan }
+    \color_show:n { foo }
+    \color_set:nn { foo } { fooCMYK!35!green }
+    \color_show:n { foo }
+  }
+
 \END

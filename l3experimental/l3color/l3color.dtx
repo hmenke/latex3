@@ -453,9 +453,17 @@
 \cs_generate_variant:Nn \@@_convert:nnN { VV }
 \cs_new_protected:Npn \@@_convert:nnnN #1#2#3#4
   {
-    \tl_set:Nx #4
+    \cs_if_exist:cTF { @@_convert_ #1 _ #2 :w }
       {
-        \use:c { @@_convert_ #1 _ #2 :w } #3 ~ 0 ~ 0 ~ 0 \s_@@_stop
+        \tl_set:Nx #4
+          {
+            \use:c { @@_convert_ #1 _ #2 :w } #3 ~ 0 ~ 0 ~ 0 \s_@@_stop
+          }
+      }
+      {
+        \__kernel_msg_error:nnnn { color }
+          { conversion-not-available } {#1} {#2}
+        \tl_set_eq:Nc #4 { c_@@_fallback_ #2 _tl }
       }
   }
 \cs_generate_variant:Nn \@@_convert:nnnN { nV , nnV }
@@ -1162,6 +1170,20 @@
 %    \end{macrocode}
 % \end{variable}
 %
+% \begin{variable}
+%   {
+%     \c_@@_fallback_cmyk_tl ,
+%     \c_@@_fallback_gray_tl ,
+%     \c_@@_fallback_rgb_tl
+%   }
+%   Fallback definitions for conversion failure.
+%    \begin{macrocode}
+\tl_const:Nn \c_@@_fallback_cmyk_tl { 0 ~ 0 ~ 0 ~ 1 }
+\tl_const:Nn \c_@@_fallback_gray_tl { 0 }
+\tl_const:Nn \c_@@_fallback_rgb_tl { 1 ~ 1 ~ 1 }
+%    \end{macrocode}
+% \end{variable}
+%
 % \subsection{Exporting colors}
 %
 % \begin{macro}{\color_export:nnN}
@@ -1394,6 +1416,7 @@
   {
     \cs_if_exist:cTF { @@_model_separation_ #2 :nnnnn }
       {
+        \tl_const:cn { c_@@_fallback_ #1 _tl } { 1 }
         \cs_new_eq:cN  { @@_parse_mix_ #1 :nw } \@@_parse_mix_gray:nw
         \cs_new:cpn { @@_parse_model_ #1 :w } ##1 , ##2 \s_@@_stop
           { {#1} { \@@_parse_number:n {##1} } }
@@ -1511,6 +1534,12 @@
 % \subsection{Messages}
 %
 % \begin{macrocode}
+\__kernel_msg_new:nnnn { color } { conversion-not-available }
+  { No~model~conversion~available~from~'#1'~to~'#2'. }
+  {
+    LaTeX~has~been~asked~to~convert~a~color~from~model~'#1'~
+    to~model'#2',~but~there~is~no~method~available~to~do~that.
+  }
 \__kernel_msg_new:nnnn { color } { model-already-defined }
   { Color~model~'#1'~already~defined. }
   {
