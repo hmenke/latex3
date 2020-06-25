@@ -152,4 +152,15 @@
     \tl_show:N \l_tmpa_tl
   }
 
+\TEST { Mixing~separations }
+  {
+    \OMIT
+    \color_set:nnn { fooCMYK } { BarToneCMYK } { 1.0 }
+    \TIMO
+    \color_set:nn { foo } { fooCMYK!35 }
+    \color_show:n { foo }
+    \color_set:nn { foo } { fooCMYK!55!white }
+    \color_show:n { foo }
+  }
+
 \END
