@@ -121,5 +121,23 @@
       { 0.1 , 0.2 , 0.3 , 0.4 / 0.1 , 0.1 , 0.2 }
     \color_show:n { foo1 }
   }
+  
+\TEST { Multiple~models~with~model~fixed }
+  {
+    \OMIT
+    \color_set:nnn { mycr } { cmyk / rgb }
+      { 1 , 0 , 0 , 0 / 1 , 0 , 0 }
+    \color_set:nnn { myrc } { rgb / cmyk }
+      { 1 , 0 , 0 / 1 , 0 , 0 , 0 }
+    \TIMO
+    \color_set:nn  { mixA } { myrc!50!mycr }
+    \color_show:n { mixA }
+    \tl_set:Nn \l_color_fixed_model_tl { cmyk }
+    \color_set:nn  { mixA } { myrc!50!mycr }
+    \color_show:n { mixA }
+    \tl_set:Nn \l_color_fixed_model_tl { rgb }
+    \color_set:nn  { mixA } { myrc!50!mycr }
+    \color_show:n { mixA }
+  }
 
 \END

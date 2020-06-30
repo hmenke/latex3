@@ -995,6 +995,8 @@
 % \end{variable}
 %
 % \begin{macro}{\color_set:nn}
+% \begin{macro}{\@@_set:nnn}
+% \begin{macro}{\@@_set:nn}
 % \begin{macro}{\@@_set:nnw}
 % \begin{macro}{\color_set:nnn}
 % \begin{macro}{\@@_set_loop:nw}
@@ -1002,9 +1004,22 @@
 %   Defining named colors means working through the model list and saving
 %   both the \enquote{main} color and any equivalents in other models. Even
 %   if there is only one model, we store a |prop| as well as a |tl|, as there
-%   could be grouping weirdness, etc.
+%   could be grouping weirdness, etc. When setting using an expression,
+%   we need to avoid any fixed model issues, which is done without a group as
+%   in \pkg{l3keys}.
 %    \begin{macrocode}
 \cs_new_protected:Npn \color_set:nn #1#2
+  {
+    \exp_args:NV \@@_set:nnn
+      \l_color_fixed_model_tl {#1} {#2}
+  }
+\cs_new_protected:Npn \@@_set:nnn #1#2#3
+  {
+    \tl_clear:N \l_color_fixed_model_tl
+    \@@_set:nn {#2} {#3}
+    \tl_set:Nn \l_color_fixed_model_tl {#1}
+  }
+\cs_new_protected:Npn \@@_set:nn #1#2
   {
     \str_if_eq:nnF {#1} { . }
       {
@@ -1091,6 +1106,8 @@
       }
   }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}

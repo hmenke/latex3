@@ -157,3 +157,27 @@ The color foo1 has the properties:
 <recently read> }
 l. ...  }
 ============================================================
+============================================================
+TEST 6: Multiple models with model fixed
+============================================================
+Defining \l__color_named_mixA_tl on line ...
+Defining \l__color_named_mixA_prop on line ...
+The color mixA has the properties:
+>  model  =>  rgb
+>  rgb  =>  1 0 0
+>  cmyk  =>  1 0 0 0.
+<recently read> }
+l. ...  }
+The color mixA has the properties:
+>  model  =>  rgb
+>  rgb  =>  1 0 0
+>  cmyk  =>  1 0 0 0.
+<recently read> }
+l. ...  }
+The color mixA has the properties:
+>  model  =>  rgb
+>  rgb  =>  1 0 0
+>  cmyk  =>  1 0 0 0.
+<recently read> }
+l. ...  }
+============================================================
