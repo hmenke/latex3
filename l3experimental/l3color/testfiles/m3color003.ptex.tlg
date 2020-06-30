@@ -91,16 +91,12 @@ l. ...  }
 ============================================================
 TEST 3: Mixing multiple models
 ============================================================
-Defining \l__color_named_myrgbcmyk_tl on line ...
-Defining \l__color_named_myrgbcmyk_prop on line ...
-Defining \l__color_named_mycmykrgb_tl on line ...
-Defining \l__color_named_mycmykrgb_prop on line ...
 Defining \l__color_named_myexpr1_tl on line ...
 Defining \l__color_named_myexpr1_prop on line ...
 The color myexpr1 has the properties:
 >  model  =>  rgb
 >  rgb  =>  1 0 1
->  cmyk  =>  1.0 0.0 0.0 1.0.
+>  cmyk  =>  1 0 0 1.
 <recently read> }
 l. ...  }
 Defining \l__color_named_myexpr2_tl on line ...
@@ -108,7 +104,23 @@ Defining \l__color_named_myexpr2_prop on line ...
 The color myexpr2 has the properties:
 >  model  =>  cmyk
 >  cmyk  =>  1 0 0 1
->  rgb  =>  1.0 0.0 1.0.
+>  rgb  =>  1 0 1.
+<recently read> }
+l. ...  }
+Defining \l__color_named_myC_tl on line ...
+Defining \l__color_named_myC_prop on line ...
+The color myC has the properties:
+>  model  =>  rgb
+>  rgb  =>  0.79 0.79 0.79
+>  cmyk  =>  0.09 0.09 0.09 0.09.
+<recently read> }
+l. ...  }
+Defining \l__color_named_myD_tl on line ...
+Defining \l__color_named_myD_prop on line ...
+The color myD has the properties:
+>  model  =>  cmyk
+>  cmyk  =>  0.09 0.09 0.09 0.09
+>  rgb  =>  0.79 0.79 0.79.
 <recently read> }
 l. ...  }
 ============================================================

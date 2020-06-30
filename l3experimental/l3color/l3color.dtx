@@ -1015,7 +1015,7 @@
         \prop_clear_new:c { l_@@_named_ #1 _prop }
         \prop_put:cvx { l_@@_named_ #1 _prop } { l_@@_named_ #1 _tl }
           { \@@_values:N \l_@@_named_tl }
-        \@@_set:nnw {#1} #2 ! \s_@@_stop
+        \@@_set:nnw {#1} {#2} #2 ! \s_@@_stop
       }
   }
 %    \end{macrocode}
@@ -1026,16 +1026,16 @@
 %   any sense here. There is a bit of a performance hit but this should be
 %   rare and taking place during set-up.
 %    \begin{macrocode}
-\cs_new_protected:Npn \@@_set:nnw #1#2 ! #3 \s_@@_stop
+\cs_new_protected:Npn \@@_set:nnw #1#2#3 ! #4 \s_@@_stop
   {
     \clist_map_inline:nn { cmyk , gray , rgb }
       {
-        \prop_get:cnNT { l_@@_named_ #2 _prop } {##1} \l_@@_internal_tl
+        \prop_get:cnNT { l_@@_named_ #3 _prop } {##1} \l_@@_internal_tl
           {
             \prop_if_in:cnF { l_@@_named_ #1 _prop } {##1}
               {
                 \group_begin:
-                  \tl_set:cn { l_@@_named_ #2 _tl } {##1}
+                  \tl_set:cn { l_@@_named_ #3 _tl } {##1}
                   \@@_parse:nN {#2} \l_@@_internal_tl
                 \exp_args:NNNV \group_end:
                 \tl_set:Nn \l_@@_internal_tl \l_@@_internal_tl

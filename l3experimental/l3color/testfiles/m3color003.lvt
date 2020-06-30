@@ -74,14 +74,26 @@
 
 \TEST { Mixing~multiple~models }
   {
+    \OMIT
     \color_set:nnn { myrgbcmyk } { rgb / cmyk }
       { 1 , 0 , 1 / 1 , 0 , 0 , 1 }
     \color_set:nnn { mycmykrgb } { cmyk / rgb }
       { 1 , 0 , 0 , 1 / 1 , 0 , 1 }
+    \TIMO
     \color_set:nn { myexpr1 } { myrgbcmyk!30!mycmykrgb }
     \color_show:n { myexpr1 }
     \color_set:nn { myexpr2 } { mycmykrgb!30!myrgbcmyk }
     \color_show:n { myexpr2 }
+    \OMIT
+    \color_set:nnn { myA }{ rgb / cmyk }
+      { 0.3 , 0.3 , 0.3 / 0.3 , 0.3 , 0.3 , 0.3 }
+    \color_set:nnn { myB }{ cmyk /rgb }
+      { 0.3 , 0.3 , 0.3 , 0.3 / 0.3 , 0.3 , 0.3 }
+    \TIMO
+    \color_set:nn { myC } { myA!30 }
+    \color_show:n { myC }
+    \color_set:nn { myD } { myB!30 }
+    \color_show:n { myD }
   }
 
 \TEST { Exporting~multiple~models }
