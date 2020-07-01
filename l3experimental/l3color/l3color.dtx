@@ -665,7 +665,8 @@
 \cs_new_protected:Npn \@@_parse_gray:n #1
   {
     \tl_set_eq:NN \l_@@_model_tl \l_@@_next_model_tl
-    \exp_args:NnV \@@_convert:nnN { gray } \l_@@_next_model_tl
+    \tl_set:Nn \l_@@_next_model_tl { gray }
+    \exp_args:NnV \@@_convert:nnN { gray } \l_@@_model_tl
       \l_@@_value_tl
     \prop_get:cVN { l_@@_named_ #1 _prop } \l_@@_model_tl
       \l_@@_next_value_tl
