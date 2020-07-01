@@ -491,6 +491,7 @@
 % \begin{macro}{\@@_parse_loop_init:Nnn}
 % \begin{macro}{\@@_parse_loop:w}
 % \begin{macro}{\@@_parse_loop:nn}
+% \begin{macro}{\@@_parse_gray:n, \@@_parse_std:n}
 % \begin{macro}{\@@_parse_break:w}
 % \begin{macro}{\@@_parse_end:}
 % \begin{macro}[aux, EXP]{\@@_parse_mix:Nnnn, \@@_parse_mix:NVVn}
@@ -641,29 +642,9 @@
         \@@_extract:nNN {#2} \l_@@_next_model_tl \l_@@_next_value_tl
         \tl_if_eq:NNF \l_@@_model_tl \l_@@_next_model_tl
           {
-            \str_if_eq:VnT \l_@@_model_tl { gray }
-              {
-                \use:x
-                  {
-                    \tl_set:Nn \exp_not:N \l_@@_model_tl
-                      { \l_@@_next_model_tl }
-                    \tl_set:Nn \exp_not:N \l_@@_value_tl
-                      { \l_@@_next_value_tl }
-                    \tl_set:Nn \exp_not:N \l_next_@@_model_tl
-                      { \l_@@_model_tl }
-                    \tl_set:Nn \exp_not:N \l_next_@@_value_tl
-                      { \l_@@_value_tl }
-                  }
-              }
-            \prop_get:cVNF { l_@@_named_ #2 _prop }
-              \l_@@_model_tl
-              \l_@@_next_value_tl
-              {
-                \@@_convert:VVN
-                  \l_@@_next_model_tl
-                  \l_@@_model_tl
-                  \l_@@_next_value_tl
-              }
+            \str_if_eq:VnTF \l_@@_model_tl { gray }
+              { \@@_parse_gray:n {#2} }
+              { \@@_parse_std:n {#2} }
           }
         \tl_set:Nx \l_@@_value_tl
           {
@@ -676,6 +657,30 @@
         \@@_extract:nNN { black } \l_@@_model_tl \l_@@_value_tl
         \@@_parse_break:w
       }
+  }
+%    \end{macrocode}
+%   The \texttt{gray} model needs special handling: the models need to be
+%   swapped: we do that using a dedicated function.
+%    \begin{macrocode}
+\cs_new_protected:Npn \@@_parse_gray:n #1
+  {
+    \tl_set_eq:NN \l_@@_model_tl \l_@@_next_model_tl
+    \exp_args:NnV \@@_convert:nnN { gray } \l_@@_next_model_tl
+      \l_@@_value_tl
+    \prop_get:cVN { l_@@_named_ #1 _prop } \l_@@_model_tl
+      \l_@@_next_value_tl
+  }
+\cs_new_protected:Npn \@@_parse_std:n #1
+  {
+    \prop_get:cVNF { l_@@_named_ #1 _prop }
+      \l_@@_model_tl
+      \l_@@_next_value_tl
+        {
+          \@@_convert:VVN
+            \l_@@_next_model_tl
+            \l_@@_model_tl
+            \l_@@_next_value_tl
+        }
   }
 \cs_new_protected:Npn \@@_parse_break:w #1 \@@_parse_end: { }
 \cs_new_protected:Npn \@@_parse_end: { }
@@ -713,6 +718,7 @@
     \fp_eval:n { #5 * #1 + #9 * ( 1 - #1 ) }
   }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1054,7 +1060,8 @@
                   \@@_parse:nN {#2} \l_@@_internal_tl
                 \exp_args:NNNV \group_end:
                 \tl_set:Nn \l_@@_internal_tl \l_@@_internal_tl
-                \prop_put:cnx { l_@@_named_ #1 _prop } {##1}
+                \prop_put:cxx { l_@@_named_ #1 _prop }
+                  { \@@_model:N \l_@@_internal_tl }
                   { \@@_values:N \l_@@_internal_tl }
               }
           }

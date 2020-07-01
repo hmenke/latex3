@@ -1,5 +1,5 @@
 %
-% Copyright (C) 2017,2018 The LaTeX3 Project
+% Copyright (C) 2017,2018,2020 The LaTeX3 Project
 %
 
 \documentclass{minimal}
@@ -62,6 +62,14 @@
     \color_show:n { foo3 }
     \color_set:nn { foo4 } { red!10!black }
     \color_show:n { foo4 }
+  }
+
+\TEST { Mixing~with~the~gray~model }
+  {
+    \color_set:nn { mywhitemixA } { white!40!red }
+    \color_show:n { mywhitemixA }
+    \color_set:nn { mywhitemixB } { red!60!white }
+    \color_show:n { mywhitemixB }
   }
 
 \TEST { Copying~named~colors }

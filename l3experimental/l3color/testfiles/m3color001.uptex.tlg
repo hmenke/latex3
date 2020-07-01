@@ -103,7 +103,25 @@ The color foo4 has the properties:
 l. ...  }
 ============================================================
 ============================================================
-TEST 5: Copying named colors
+TEST 5: Mixing with the gray model
+============================================================
+Defining \l__color_named_mywhitemixA_tl on line ...
+Defining \l__color_named_mywhitemixA_prop on line ...
+The color mywhitemixA has the properties:
+>  model  =>  rgb
+>  rgb  =>  1 0.4 0.4.
+<recently read> }
+l. ...  }
+Defining \l__color_named_mywhitemixB_tl on line ...
+Defining \l__color_named_mywhitemixB_prop on line ...
+The color mywhitemixB has the properties:
+>  model  =>  rgb
+>  rgb  =>  1 0.4 0.4.
+<recently read> }
+l. ...  }
+============================================================
+============================================================
+TEST 6: Copying named colors
 ============================================================
 The color foo2 has the properties:
 >  model  =>  cmyk
@@ -112,7 +130,7 @@ The color foo2 has the properties:
 l. ...  }
 ============================================================
 ============================================================
-TEST 6: Copying the current color
+TEST 7: Copying the current color
 ============================================================
 Defining \l__color_named_foo_tl on line ...
 Defining \l__color_named_foo_prop on line ...
@@ -123,7 +141,7 @@ The color foo has the properties:
 l. ...  }
 ============================================================
 ============================================================
-TEST 7: Selecting colors
+TEST 8: Selecting colors
 ============================================================
 > \box...=
 \hbox(6.94444+0.0)x22.50005
@@ -179,7 +197,7 @@ l. ...  }
 l. ...  }
 ============================================================
 ============================================================
-TEST 8: Fixing the model
+TEST 9: Fixing the model
 ============================================================
 > \box...=
 \hbox(6.94444+0.0)x22.50005
@@ -235,7 +253,7 @@ l. ...  }
 l. ...  }
 ============================================================
 ============================================================
-TEST 9: Showing colors
+TEST 10: Showing colors
 ============================================================
 The color unknown is undefined.
 > .
