@@ -135,4 +135,21 @@
     \color_show:n { cyan }
   }
 
+\TEST { Managing~the~current~color }
+  {
+     \OMIT
+     \color_set:nnn { myc } { cmyk } { 0 , 1 , 0.5 , 0 }
+     \color_select:n { myc } abc
+     \TIMO
+     \color_show:n { . }
+     \color_select:n { . } abc
+     \OMIT
+     \color_set:nnn { myrc } { rgb / cmyk }
+       { 1 , 0 , 0 / 0 , 1 , 0 , 0 }
+     \color_select:n { myrc } abc
+     \TIMO
+     \color_show:n { . }
+     \color_select:n { . } abc
+  }
+
 \END
